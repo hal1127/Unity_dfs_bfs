@@ -22,12 +22,6 @@ public class Tree : MonoBehaviour
 
   bool played = true;
 
-  private IEnumerator DelayCoroutine(float seconds, Action action)
-  {
-    yield return new WaitForSeconds(seconds);
-    action?.Invoke();
-  }
-
   void create_tree_array(List<int> a)
   {
     for (int i = 0; i < a.Count+1; i++) {
@@ -41,15 +35,26 @@ public class Tree : MonoBehaviour
     }
   }
 
-  Vector2 create_node(Vector2 parent_pos, int index, int parent_index, int chd_index)
+  Vector2 create_node(Vector2 parent_pos, int index, int parent_index, int parent_chlid_index, int child_index)
   {
     Vector2 now_pos;
     if (index == 0) {
       now_pos = new Vector2(0, 0);
-    } else if (chd_index == 0) {
+    } else if (parent_chlid_index == 1 && tree_array[parent_index].Count > 1) {
+      if (child_index == 0) {
+        now_pos = parent_pos + node_offset;
+      } else {
+        now_pos = parent_pos + node_offset * new Vector2(-1, 1);
+      }
+    } else if (parent_chlid_index == 1 && child_index == 0) {
+      now_pos = parent_pos + node_offset * new Vector2(-1, 1);
+    } else if (child_index == 1) {
+      now_pos = parent_pos + node_offset * new Vector2(-1, 1);
+      // 長男なら左側
+    } else if (child_index == 0) {
       now_pos = parent_pos + node_offset;
     } else {
-      now_pos = parent_pos + node_offset * new Vector2(-1, 1);
+      now_pos = parent_pos + node_offset;
     }
 
     var node_go = Instantiate(node,
@@ -73,19 +78,15 @@ public class Tree : MonoBehaviour
     return now_pos;
   }
 
-	void create_tree(int index, int parent_index, int chld_index, List<List<int>> tree, Vector2 parent_pos)
+	void create_tree(int index, int parent_index, int parent_chlid_index, int chlid_index, List<List<int>> tree, Vector2 parent_pos)
 	{
-    parent_pos = create_node(parent_pos, index, parent_index, chld_index);
+    parent_pos = create_node(parent_pos, index, parent_index, parent_chlid_index, chlid_index);
 
     if (tree_array[index].Count == 0) {
       return;
     }
     for (int i = 0; i < tree_array[index].Count; i++) {
-      if (chld_index == 1) {
-        create_tree(tree_array[index][i], index, 1-i, tree_array, parent_pos);
-      } else {
-        create_tree(tree_array[index][i], index, i, tree_array, parent_pos);
-      }
+      create_tree(tree_array[index][i], index, chlid_index, i, tree_array, parent_pos);
     }
 	}
 
@@ -142,7 +143,7 @@ public class Tree : MonoBehaviour
 
     Vector2 parent_pos = new Vector2(0, 0);
 
-    create_tree(0, -1, 0, tree_array, parent_pos);
+    create_tree(0, -1, 0, 0, tree_array, parent_pos);
     // for (int i = 0; i < tree_go.Count; i++) {
     //   string cnt_log = (i-1).ToString()+": "+tree_go[i].Count.ToString();
     //   Debug.Log(cnt_log);
