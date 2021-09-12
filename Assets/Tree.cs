@@ -8,7 +8,6 @@ using System.Threading;
 public class Tree : MonoBehaviour
 {
   public GameObject node;
-  public GameObject arrow;
   public GameObject line;
   public GameObject tree_text;
 
@@ -73,7 +72,9 @@ public class Tree : MonoBehaviour
     var canvas = node_go.transform.Find("Canvas").gameObject;
     var text_go = canvas.transform.Find("Text").gameObject;
     var text = text_go.GetComponent<Text>();
-    text.text = index.ToString();
+    char c = (char)((int)'A'+index);
+    Debug.Log(c.ToString());
+    text.text = c.ToString();
 
     return now_pos;
   }
@@ -94,7 +95,6 @@ public class Tree : MonoBehaviour
   // 深さ優先探索
   IEnumerator dfs(GameObject go, int index)
   {
-    yield return new WaitForSeconds(1.0f);
     var circle = go.transform.Find("Circle").gameObject;
     circle.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
     // 一秒停止
@@ -115,7 +115,6 @@ public class Tree : MonoBehaviour
     while (q.Count != 0) {
       int now = q.Dequeue();
       foreach (var go in tree_go[now]) {
-        yield return new WaitForSeconds(1.0f);
         var circle = go.transform.Find("Circle").gameObject;
         circle.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
         yield return new WaitForSeconds(1.0f);
